@@ -1,0 +1,215 @@
+initialize() {
+	
+	defineConstant("Gnm_len", 2500000000);	// Genome length
+	defineConstant("N_chr", 17);	// N chromosomes
+	defineConstant("GL", 43407);	// average gene length (all genes will be of this size)
+	defineConstant("nnGL", 66372);	// average non-genic segments length (all intergenic regions will be of this length)
+	defineConstant("rec", 0.00000001);	// recombination rate within chromosome 
+	defineConstant("rec0", 0.5);	// recombination rate to separate chromosomes
+	defineConstant("mut0", 0);	// no neutral mutations in intergenic regions (neutral mutations don't play any role in genetic load, so let's remove them to speed up simulations)
+	defineConstant("mut", 6e-10);	// mut rate within genes. Set so that U ~ 1.2.
+	defineConstant("del_mut", 1001);
+	// Generate different mutation types from a gamma distribution. This is required so that their dominance coefficient can be set appropriately.
+	m2_gamma=sort(rgamma(1e6,0.04,0.2));
+	m2_gamma[(1e6*0.95):(1e6-1)]=1;
+	m2_gamma=m2_gamma*-1;
+	m2_gamma[m2_gamma<(-1)]=(-1);
+	m2_bins=seq(min(m2_gamma),max(m2_gamma),length=asInteger(del_mut));
+	prop=c();
+	mtype=c();
+	s=c();
+	i=0;
+	for (i in 0:(length(m2_bins)-2))
+	{
+		propX=length(m2_gamma[m2_bins[i]<=m2_gamma&m2_bins[i+1]>=m2_gamma])/length(m2_gamma);
+		prop=c(prop,propX);
+		sX=mean(c(m2_bins[i],m2_bins[i+1]));
+		s=c(s,sX);
+		mtype=c(mtype,"m"+i);
+	}
+	s[s<(-1)]=(-1);
+	h=0.5*10^(13*s);
+	
+	for (i in 0:(length(m2_bins)-2))
+	{
+		initializeMutationType(i, h[i], "f", asFloat(s[i]));
+		}
+	
+	
+	// g1 is for non genic regions, g2 is for genes
+	initializeGenomicElementType("g1", c(m1), 1); // there will be no neutral muts here
+	initializeGenomicElementType("g2", 0:(del_mut-2), prop);
+													
+	// Create a genome with equally spaced genes of equal length
+	// set also the mutation rates
+	m_r=seq(0.1,4554.6,by=0.1); // Create vector to host mutation rates
+	m_ex=seq(1,22773); // Create vector to host end of gene coordniates
+	m_nng=seq(1,22773); // Create vector to host end of intergenic region coordniates
+	ind=seq(0,Gnm_len,GL+nnGL+2); // Create an index to generate genomic elements
+	
+	// the following will create a series of "gene followed by an intergenic region" and register their coordinates
+	for (i in 0:(length(ind)-1)){
+	initializeGenomicElement(g2, ind[i], ind[i]+GL);
+	m_ex[i]=ind[i]+GL;
+	initializeGenomicElement(g1, ind[i]+GL+1, ind[i]+GL+1+nnGL);
+	m_nng[i]=ind[i]+GL+1+nnGL;
+	}
+	real_size=ind[i]+GL+1+nnGL;
+	
+	// set the mutation rate within intergenic regions to 0, so that the simulation will speed up super much by not generating useless neutral mutations
+	mm=sort(c(m_ex,m_nng));
+	for (i in seq(0,(length(mm)-1),by=2)){
+	m_r[i]=mut;
+	m_r[i+1]=mut0;
+	}
+  
+	initializeMutationRate(m_r,mm);
+	
+	// Set recomb rate to divide chromosomes
+	bla = asInteger(real_size/N_chr);
+	end=seq(1,N_chr*2-1);
+	index=seq(1,N_chr*2-2,by=2);
+	for (i in 1:length(index)){
+	end[index[i-1]-1]=bla*i;
+	end[index[i-1]]=end[index[i-1]-1]+1;
+	}
+	end[length(end)-1]=real_size;
+	
+	rates = seq(0.1,(length(end)+1)/10,by=0.1);
+	for (i in seq(1,length(end)-1,by=2)){
+	rates[i-1]=rec;
+	rates[i]=rec0;
+	}
+	rates[length(rates)-1]=rec;
+	
+	initializeRecombinationRate(rates,end);
+	
+	
+	initializeSex("A");
+	// Separate sexes
+}
+
+// create a population of 267 individuals (NeLGM) and let it run for 3000 generations to accumulate mutations.
+1 {
+	sim.mutationTypes.convertToSubstitution=F;
+	sim.addSubpop("p1", 267, 0.5); // Set the sex ration appropriately!!!
+}
+
+// Heres the exponential post LGM expansion, leading to NePreBot
+3000:3878 {
+t = sim.generation - 3000;
+p1_size = round(267 * exp(0.00441532*t));
+p1.setSubpopulationSize(asInteger(p1_size));
+}
+
+// Start Bottleneck
+5077 {
+p1.setSubpopulationSize(6);
+}
+
+// Heres the exponential post bott expansion, leading to NePostBot
+5083:5100 {
+t = sim.generation - 5083;
+p1_size = round(6 * exp(0.357688*t));
+p1.setSubpopulationSize(asInteger(p1_size));
+}
+
+5076 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3076.txt");
+}
+
+5077 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3077.txt");
+}
+
+5078 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3078.txt");
+}
+
+5079 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3079.txt");
+}
+
+5080 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3080.txt");
+}
+
+5081 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3081.txt");
+}
+
+5082 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3082.txt");
+}
+
+5083 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3083.txt");
+}
+
+5084 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3084.txt");
+}
+
+5085 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3085.txt");
+}
+
+5086 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3086.txt");
+}
+
+5087 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3087.txt");
+}
+
+5088 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3088.txt");
+}
+
+5089 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3089.txt");
+}
+
+5090 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3090.txt");
+}
+
+5091 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3091.txt");
+}
+
+5092 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3092.txt");
+}
+
+5093 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3093.txt");
+}
+
+5094 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3094.txt");
+}
+
+5095 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3095.txt");
+}
+
+5096 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3096.txt");
+}
+
+5097 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3097.txt");
+}
+
+5098 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3098.txt");
+}
+
+5099 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3099.txt");
+}
+
+5100 late() {
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/St_Bott/WEx/rep_1/gen_3100.txt");
+}

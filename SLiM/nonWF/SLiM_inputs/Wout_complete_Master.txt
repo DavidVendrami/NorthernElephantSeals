@@ -1,0 +1,316 @@
+initialize() {
+	initializeSLiMModelType("nonWF");
+	
+	defineConstant("Klgm", 2670);	// carrying capacity at LGM
+	defineConstant("KPrB", 1104330); // carrying capacity before bott
+	defineConstant("KB", BOTT_SIZE);	// carrying capacity during bott
+	defineConstant("KPoB", 350000);	// carrying capacity after bott
+	defineConstant("InitPop", 2670); //initial population size
+	defineConstant("SexR", 0.5); // Sex ratio
+	defineConstant("L", c(0.37, 0.26, 0.19, 0.16, 0.15, 0.15, 0.15, 0.3, 0.95, 0.95, 0.95, 0.99, 0.99, 0.99, 1.0));
+	defineConstant("del_mut", 1001);
+	
+	initializeMutationRate(2.7e-10); // Mutation rate
+	initializeSex("A"); // Enable separate sexes
+	
+	m2_gamma=sort(rgamma(1e6,0.04,0.2));
+	m2_gamma[(1e6*0.95):(1e6-1)]=1;
+	m2_gamma=m2_gamma*-1;
+	m2_gamma[m2_gamma<(-1)]=(-1);
+	m2_bins=seq(min(m2_gamma),max(m2_gamma),length=asInteger(del_mut));
+	prop=c();
+	mtype=c();
+	s=c();
+	i=0;
+	for (i in 0:(length(m2_bins)-2))
+	{
+		propX=length(m2_gamma[m2_bins[i]<=m2_gamma&m2_bins[i+1]>=m2_gamma])/length(m2_gamma);
+		prop=c(prop,propX);
+		sX=mean(c(m2_bins[i],m2_bins[i+1]));
+		s=c(s,sX);
+		mtype=c(mtype,"m"+i);
+	}
+	s[s<(-1)]=(-1);
+	h=0.5*10^(13*s);
+	
+	for (i in 0:(length(m2_bins)-2))
+	{
+		initializeMutationType(i, h[i], "f", asFloat(s[i]));
+		}
+	
+	// g1 genomic element type: uses m1 for all mutations
+	// initializeGenomicElementType("g1", c(m1,m2,m3), c(0.3,0.665,0.035)); // !!! This is absolutely fundamental !!! Graur, D. An upper limit on the functional fraction 		of the human genome. Genome Biol.Evol. 9, 18801885 (2017)
+
+	//initializeGenomicElementType("g2", c(m1),0.02);
+	
+	initializeGenomicElementType("g1", 0:(del_mut-2), prop); // !!! This is absolutely fundamental !!!
+	
+	initializeGenomicElement(g1, 0, 2184605547); // !!! Need to change this to something more appropriate !!!	
+	ends=c(111871330,111871331,251547378,251547379,417272540,417272541,561663406,561663407,749681569,749681570,835133943,835133944,964042349,964042350,1049596993,1049596994,1104517511,1104517512,1157967553,1157967554,1259179298,1259179299,1436633411,1436633412,1568930140,1568930141,1768492140,1768492141,1866478667,1866478668,2002101750,2002101751,2184605547);
+	rates=c(1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8);
+	initializeRecombinationRate(rates,ends); // Important!!! Decrease for shorter genomes
+	}
+
+// Simple reproduction for burn-in (Ne / N ~ 0.1)
+1:26700 reproduction(){
+	fems = p1.individuals[p1.individuals.sex=="F"];
+	for (i in fems){
+	p1.addCrossed(i, p1.sampleIndividuals(1,sex="M"));
+}
+self.active = 0;
+}
+
+// Harem style repr
+26701:41977 reproduction(){
+// Reproducing males
+males=p1.individuals[p1.individuals.sex == "M" & p1.individuals.age >= 6]; // All males in the population
+//PropM=runif(1,0.14,0.35); // Less than a third of the males reproduce
+repr = round(0.05*length(males)); // Select 5% of random males as reproducers (harem masters)
+if (repr>=1){
+repr_males = sample(males,asInteger(repr),replace=F);
+} else {
+repr_males = sample(males,1,replace=F);
+}
+
+// Females, if you want keep only a percentage as in males
+fems=p1.individuals[p1.individuals.sex=="F" & p1.individuals.age >= 3];
+PropF=runif(1,0.95,1.00);
+reprf = round(PropF*length(fems)); // Select 1% of random males as reproducers (harem masters)
+if (reprf>=1){
+repr_females = sample(fems,asInteger(reprf),replace=F);
+} else {
+repr_females = sample(fems,1,replace=F);
+}
+
+// reproduction
+for (i in repr_females){
+parent1 = i;
+parent2 = sample(repr_males,1);
+p1.addCrossed(parent1, parent2); // Each female will cross with one of the harem masters
+}
+self.active = 0;
+}
+
+// create a population of InitPop individuals (NeLGM) and let it run for 2000 generations to accumulate mutations.
+1 early() {
+	sim.mutationTypes.convertToSubstitution=F;
+	sim.addSubpop("p1", InitPop, SexR); // Set the sex ration appropriately!!!
+	p1.individuals.age = rdunif(InitPop, min=0, max=7);
+}
+
+// provide age- and density-dependent selection
+1:26700 early() {
+        inds = p1.individuals;
+        p1.fitnessScaling = Klgm / (p1.individualCount);
+		inds[inds.age > 12].fitnessScaling = 0.0;
+}
+
+// Here's the post LGM expansion, leading to NePreBot. Pop size is emerging so no need to model growth as in WF model: the simualation will grow and stabilize by itself.
+26701:41769 early() {
+inds = p1.individuals;
+	ages = inds.age;
+	mortality = L[ages];
+	survival = 1 - mortality;
+	inds.fitnessScaling = survival;
+	p1.fitnessScaling = KPrB / (p1.individualCount * mean(survival));
+}
+
+// Start Bottleneck
+41770:41823 early() {
+inds = p1.individuals;
+	ages = inds.age;
+	mortality = L[ages];
+	survival = 1 - mortality;
+	inds.fitnessScaling = survival;
+	p1.fitnessScaling = KB / (p1.individualCount * mean(survival));
+}
+
+// End bottleneck
+41824:41977 early(){
+inds = p1.individuals;
+	ages = inds.age;
+	mortality = L[ages];
+	survival = 1 - mortality;
+	inds.fitnessScaling = survival;
+p1.fitnessScaling = KPoB / (p1.individualCount * mean(survival));
+}
+
+41768 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/Burn-in.txt");
+}
+
+41769 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3076.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41770 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3077.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41779 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3078.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41788 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3079.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41797 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3080.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41806 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3081.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41815 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3082.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41824 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3083.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41833 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3084.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41842 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3085.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41851 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3086.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41860 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3087.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41869 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3088.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41878 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3089.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41887 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3090.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41896 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3091.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41905 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3092.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41914 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3093.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41923 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3094.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41932 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3095.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41941 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3096.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41950 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3097.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41959 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3098.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41968 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3099.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+
+41977 late() {
+sim.outputFull(filePath="/PATH_TO_repN_directory/gen_3100.txt");
+siz = length(p1.individuals);
+catn('Pop_size at ' + sim.generation + ':' + siz);
+catn("Late_Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+}
+

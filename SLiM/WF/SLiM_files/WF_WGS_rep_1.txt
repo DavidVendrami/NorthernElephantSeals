@@ -1,0 +1,190 @@
+initialize() {
+	initializeMutationRate(2.7e-10); //Set this to have U = 1.2
+	
+	defineConstant("del_mut", 1001);
+	// Generate different mutation types from a gamma distribution. This is required so that their dominance coefficient can be set appropriately.
+	m2_gamma=sort(rgamma(1e6,0.04,0.2));
+	m2_gamma[(1e6*0.95):(1e6-1)]=1;
+	m2_gamma=m2_gamma*-1;
+	m2_gamma[m2_gamma<(-1)]=(-1);
+	m2_bins=seq(min(m2_gamma),max(m2_gamma),length=asInteger(del_mut));
+	prop=c();
+	mtype=c();
+	s=c();
+	i=0;
+	for (i in 0:(length(m2_bins)-2))
+	{
+		propX=length(m2_gamma[m2_bins[i]<=m2_gamma&m2_bins[i+1]>=m2_gamma])/length(m2_gamma);
+		prop=c(prop,propX);
+		sX=mean(c(m2_bins[i],m2_bins[i+1]));
+		s=c(s,sX);
+		mtype=c(mtype,"m"+i);
+	}
+	s[s<(-1)]=(-1);
+	h=0.5*10^(13*s);
+	
+	for (i in 0:(length(m2_bins)-2))
+	{
+		initializeMutationType(i, h[i], "f", asFloat(s[i]));
+		}
+	
+	initializeGenomicElementType("g1", 0:(del_mut-2), prop); // !!! This is absolutely fundamental !!!
+	
+	initializeGenomicElement(g1, 0, 2184605547); // !!! Need to change this to something more appropriate !!!	
+	ends=c(111871330,111871331,251547378,251547379,417272540,417272541,561663406,561663407,749681569,749681570,835133943,835133944,964042349,964042350,1049596993,1049596994,1104517511,1104517512,1157967553,1157967554,1259179298,1259179299,1436633411,1436633412,1568930140,1568930141,1768492140,1768492141,1866478667,1866478668,2002101750,2002101751,2184605547);
+	rates=c(1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8,0.5,1e-8);
+	initializeRecombinationRate(rates,ends); // Important!!! Decrease for shorter genomes
+	
+	initializeSex("A");
+	// Separate sexes
+}
+
+// create a population of 267 individuals (NeLGM) and let it run for 3000 generations to accumulate mutations.
+1 {
+	sim.mutationTypes.convertToSubstitution=F;
+	sim.addSubpop("p1", 1636, 0.5); // Set the sex ration appropriately!!!
+}
+
+// Heres the exponential post LGM expansion, leading to NePreBot
+16000:17699 {
+t = sim.generation - 16000;
+p1_size = round(1636 * exp(0.0005758571*t));
+p1.setSubpopulationSize(asInteger(p1_size));
+}
+
+// Start Bottleneck
+18077 {
+p1.setSubpopulationSize(3);
+}
+
+// Heres the exponential post bott expansion, leading to NePostBot
+18087:18100 {
+t = sim.generation - 18087;
+p1_size = round(3 * exp(0.6415123*t));
+p1.setSubpopulationSize(asInteger(p1_size));
+}
+
+18076 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3076.txt");
+}
+
+18077 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3077.txt");
+}
+
+18078 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3078.txt");
+}
+
+18079 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3079.txt");
+}
+
+18080 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3080.txt");
+}
+
+18081 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3081.txt");
+}
+
+18082 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3082.txt");
+}
+
+18083 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3083.txt");
+}
+
+18084 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3084.txt");
+}
+
+18085 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3085.txt");
+}
+
+18086 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3086.txt");
+}
+
+18087 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3087.txt");
+}
+
+18088 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3088.txt");
+}
+
+18089 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3089.txt");
+}
+
+18090 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3090.txt");
+}
+
+18091 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3091.txt");
+}
+
+18092 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3092.txt");
+}
+
+18093 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3093.txt");
+}
+
+18094 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3094.txt");
+}
+
+18095 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3095.txt");
+}
+
+18096 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3096.txt");
+}
+
+18097 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3097.txt");
+}
+
+18098 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3098.txt");
+}
+
+18099 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3099.txt");
+}
+
+18100 late() {
+catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3100.txt");
+}
