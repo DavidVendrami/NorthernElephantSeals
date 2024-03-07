@@ -7,7 +7,7 @@ initialize() {
 	defineConstant("KPoB", 350000);	// carrying capacity after bott
 	defineConstant("InitPop", 2670); //initial population size
 	defineConstant("SexR", 0.5); // Sex ratio
-	defineConstant("L", c(0.37, 0.26, 0.19, 0.16, 0.15, 0.15, 0.15, 0.3, 0.95, 0.95, 0.95, 0.99, 0.99, 0.99, 1.0));
+	defineConstant("L", c(0.632, 0.294, 0.253, 0.16, 0.15, 0.15, 0.15, 0.3, 0.95, 0.95, 0.95, 0.99, 0.99, 0.99, 1.0));
 	defineConstant("del_mut", 1001);
 	
 	initializeMutationRate(2.7e-10); // Mutation rate
