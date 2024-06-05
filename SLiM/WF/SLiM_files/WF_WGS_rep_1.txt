@@ -1,8 +1,18 @@
 initialize() {
 	initializeMutationRate(2.7e-10); //Set this to have U = 1.2
 	
+	//defineConstant("Nm", 0.3);	// reative frequency of neutral mutations
+	defineConstant("LDm", 0.95);	// reative frequency of LD mutations
+	defineConstant("HDm", 0.05);	// reative frequency of HD mutations
 	defineConstant("del_mut", 1001);
-	// Generate different mutation types from a gamma distribution. This is required so that their dominance coefficient can be set appropriately.
+	// m1 mutation type: neutral
+	
+	//initializeMutationType("m1", 0.5, "f", 0.0); // Neutral mutations
+	//initializeMutationType("m2", 0.45, "g", -0.01,0.2); // Mildly deleterious mutations (slightly recessive)
+	//m2.convertToSubstitution = F; // Retain fixed "m2" mutations
+	//initializeMutationType("m3", 0.01, "n", -1, 0.01); // Highly deleterious mutations (fully recessive)
+	//m3.convertToSubstitution = F; // Retain fixed "m2" mutations
+	// Distribution and paramters for m2 and m3 chosen so that the distribution effect of deleterious mutations is strongly bimodal. 
 	m2_gamma=sort(rgamma(1e6,0.04,0.2));
 	m2_gamma[(1e6*0.95):(1e6-1)]=1;
 	m2_gamma=m2_gamma*-1;
@@ -28,6 +38,11 @@ initialize() {
 		initializeMutationType(i, h[i], "f", asFloat(s[i]));
 		}
 	
+	// g1 genomic element type: uses m1 for all mutations
+	// initializeGenomicElementType("g1", c(m1,m2,m3), c(0.3,0.665,0.035)); // !!! This is absolutely fundamental !!! Graur, D. An upper limit on the functional fraction 		of the human genome. Genome Biol.Evol. 9, 18801885 (2017)
+
+	//initializeGenomicElementType("g2", c(m1),0.02);
+	
 	initializeGenomicElementType("g1", 0:(del_mut-2), prop); // !!! This is absolutely fundamental !!!
 	
 	initializeGenomicElement(g1, 0, 2184605547); // !!! Need to change this to something more appropriate !!!	
@@ -42,149 +57,229 @@ initialize() {
 // create a population of 267 individuals (NeLGM) and let it run for 3000 generations to accumulate mutations.
 1 {
 	sim.mutationTypes.convertToSubstitution=F;
-	sim.addSubpop("p1", 1636, 0.5); // Set the sex ration appropriately!!!
+	sim.addSubpop("p1", 706, 0.5); // Set the sex ration appropriately!!!
 }
 
 // Heres the exponential post LGM expansion, leading to NePreBot
-16000:17699 {
-t = sim.generation - 16000;
-p1_size = round(1636 * exp(0.0005758571*t));
+7000:8552 {
+t = sim.generation - 7000;
+p1_size = round(706 * exp(0.00181655*t));
 p1.setSubpopulationSize(asInteger(p1_size));
 }
 
 // Start Bottleneck
-18077 {
-p1.setSubpopulationSize(3);
+9077 {
+p1.setSubpopulationSize(2);
 }
 
+// End bottleneck
+//4083 {
+//p1.setSubpopulationSize(2746);
+//}
+
 // Heres the exponential post bott expansion, leading to NePostBot
-18087:18100 {
-t = sim.generation - 18087;
-p1_size = round(3 * exp(0.6415123*t));
+9083:9100 {
+t = sim.generation - 9083;
+p1_size = round(2 * exp(0.4733453*t));
 p1.setSubpopulationSize(asInteger(p1_size));
 }
 
-18076 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9076 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3076.txt");
 }
 
-18077 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9077 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3077.txt");
 }
 
-18078 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9078 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3078.txt");
 }
 
-18079 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9079 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3079.txt");
 }
 
-18080 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9080 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3080.txt");
 }
 
-18081 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9081 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3081.txt");
 }
 
-18082 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9082 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3082.txt");
 }
 
-18083 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9083 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3083.txt");
 }
 
-18084 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9084 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3084.txt");
 }
 
-18085 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9085 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3085.txt");
 }
 
-18086 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9086 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3086.txt");
 }
 
-18087 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9087 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3087.txt");
 }
 
-18088 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9088 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3088.txt");
 }
 
-18089 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9089 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3089.txt");
 }
 
-18090 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9090 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3090.txt");
 }
 
-18091 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9091 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3091.txt");
 }
 
-18092 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9092 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3092.txt");
 }
 
-18093 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9093 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3093.txt");
 }
 
-18094 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9094 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3094.txt");
 }
 
-18095 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9095 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3095.txt");
 }
 
-18096 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9096 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3096.txt");
 }
 
-18097 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9097 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3097.txt");
 }
 
-18098 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9098 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3098.txt");
 }
 
-18099 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9099 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3099.txt");
 }
 
-18100 late() {
-catn("Mean_Fitness: " + mean(p1.cachedFitness(NULL)));
+9100 late() {
+//neut=sim.countOfMutationsOfType(m1);
+//ld=sim.countOfMutationsOfType(m2);
+//hd=sim.countOfMutationsOfType(m3);
+//catn("LD: " + ld + "; HD: " + hd);
 sim.outputFull(filePath="/prj/furseal-genome/David/NES/SLiM/SLiM_3.7.1/WF/WGS_10/rep_1/gen_3100.txt");
 }
