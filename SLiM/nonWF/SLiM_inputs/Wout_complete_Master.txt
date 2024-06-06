@@ -1,7 +1,7 @@
 initialize() {
 	initializeSLiMModelType("nonWF");
 
-	######## A big thank you to Hernan E. Morales for sharing his SLiM code model effect sizes! ########
+	/////////// A big thank you to Hernan E. Morales for sharing his SLiM code model effect sizes! ########
 	defineConstant("Klgm", 2670);	// carrying capacity at LGM
 	defineConstant("KPrB", 1104330); // carrying capacity before bott
 	defineConstant("KB", BOTT_SIZE);	// carrying capacity during bott
