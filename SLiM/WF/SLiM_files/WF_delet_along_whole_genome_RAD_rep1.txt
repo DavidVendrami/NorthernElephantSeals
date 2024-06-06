@@ -1,6 +1,7 @@
 initialize() {
 	initializeMutationRate(2.7e-10); // Set this to have U = 1.2
-	
+
+	######## A big thank you to Hernan E. Morales for sharing his SLiM code model effect sizes! ########
 	defineConstant("del_mut", 1001);
 	// Generate different mutation types from a gamma distribution. This is required so that their dominance coefficient can be set appropriately.
 	m2_gamma=sort(rgamma(1e6,0.04,0.2));
