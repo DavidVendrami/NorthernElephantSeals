@@ -1,5 +1,6 @@
 initialize() {
-	
+
+	######## A big thank you to Hernan E. Morales for sharing his SLiM code model effect sizes! ########
 	defineConstant("Gnm_len", 2500000000);	// Genome length
 	defineConstant("N_chr", 17);	// N chromosomes
 	defineConstant("GL", 43407);	// average gene length (all genes will be of this size)
