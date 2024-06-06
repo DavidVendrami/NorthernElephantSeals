@@ -6,7 +6,8 @@ initialize() {
 	defineConstant("HDm", 0.05);	// reative frequency of HD mutations
 	defineConstant("del_mut", 1001);
 	// m1 mutation type: neutral
-	
+
+	######## A big thank you to Hernan E. Morales for sharing his SLiM code model effect sizes! ########
 	//initializeMutationType("m1", 0.5, "f", 0.0); // Neutral mutations
 	//initializeMutationType("m2", 0.45, "g", -0.01,0.2); // Mildly deleterious mutations (slightly recessive)
 	//m2.convertToSubstitution = F; // Retain fixed "m2" mutations
