@@ -4,7 +4,7 @@ initialize() {
 	defineConstant("Klgm", 2670);	// carrying capacity at LGM
 	defineConstant("KPrB", 1104330); // carrying capacity before bott
 	defineConstant("KB", BOTT_SIZE);	// carrying capacity during bott
-	defineConstant("KPoB", 350000);	// carrying capacity after bott
+	defineConstant("KPoB", 500000);	// carrying capacity after bott
 	defineConstant("InitPop", 2670); //initial population size
 	defineConstant("SexR", 0.5); // Sex ratio
 	defineConstant("L", c(0.632, 0.294, 0.253, 0.16, 0.15, 0.15, 0.15, 0.3, 0.95, 0.95, 0.95, 0.99, 0.99, 0.99, 1.0));
