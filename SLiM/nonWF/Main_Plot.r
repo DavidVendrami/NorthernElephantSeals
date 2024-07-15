@@ -69,7 +69,7 @@ ms<-apply(data,1,function(x) mean(x,na.rm=T))
 plot((data$V1),type='l',ylim=c(0,350000),yaxt='n',axes=F,ylab="",xaxt='n',xlab="",main="",col=transp(sims,tra))
 points(c(25-10.1,25-5.7,25-3.4,25-2.18,25-0),c(350,15000,120000,127000,225000),cex=2,pch=20,col=emp)
 segments(c(25-10.1,25-5.7,25-3.4,25-2.18), c(350,15000,120000,127000), c(25-5.7,25-3.4,25-2.18,25-0), c(15000,120000,127000,225000), lwd=2, col=emp)
-for (i in 2:84){
+for (i in 2:100){
 if (length(which(data[,i]%in%NA))!=0){
 par(new=T)
 plot(min((which(data[,i]%in%NA)))-2,-(data[min(which(data[,i]%in%NA))-1,i]),type='l',axes=F,col=transp(sims,tra),ylim=c(0,350000),main="",xlab="",ylab="",xaxt='n',yaxt='n')
@@ -95,7 +95,7 @@ ms<-apply(data,1,function(x) mean(x,na.rm=T))
 plot((data$V1),type='l',ylim=c(0,350000),yaxt='n',axes=F,ylab="",xaxt='n',xlab="",main="",col=transp(sims,tra))
 points(c(25-10.1,25-5.7,25-3.4,25-2.18,25-0),c(350,15000,120000,127000,225000),cex=2,pch=20,col=emp)
 segments(c(25-10.1,25-5.7,25-3.4,25-2.18), c(350,15000,120000,127000), c(25-5.7,25-3.4,25-2.18,25-0), c(15000,120000,127000,225000), lwd=2, col=emp)
-for (i in 2:84){
+for (i in 2:100){
 if (length(which(data[,i]%in%NA))!=0){
 par(new=T)
 plot(min((which(data[,i]%in%NA)))-2,-(data[min(which(data[,i]%in%NA))-1,i]),type='l',axes=F,col=transp(sims,tra),ylim=c(0,350000),main="",xlab="",ylab="",xaxt='n',yaxt='n')
@@ -121,7 +121,7 @@ ms<-apply(data,1,function(x) mean(x,na.rm=T))
 plot((data$V1),type='l',ylim=c(0,350000),yaxt='n',axes=F,ylab="",xaxt='n',xlab="",main="",col=transp(sims,tra))
 points(c(25-10.1,25-5.7,25-3.4,25-2.18,25-0),c(350,15000,120000,127000,225000),cex=2,pch=20,col=emp)
 segments(c(25-10.1,25-5.7,25-3.4,25-2.18), c(350,15000,120000,127000), c(25-5.7,25-3.4,25-2.18,25-0), c(15000,120000,127000,225000), lwd=2, col=emp)
-for (i in 2:84){
+for (i in 2:100){
 if (length(which(data[,i]%in%NA))!=0){
 par(new=T)
 plot(min((which(data[,i]%in%NA)))-2,-(data[min(which(data[,i]%in%NA))-1,i]),type='l',axes=F,col=transp(sims,tra),ylim=c(0,350000),main="",xlab="",ylab="",xaxt='n',yaxt='n')
@@ -147,7 +147,7 @@ ms<-apply(data,1,function(x) mean(x,na.rm=T))
 plot((data$V1),type='l',ylim=c(0,350000),yaxt='n',axes=F,ylab="",xaxt='n',xlab="",main="",col=transp(sims,tra))
 points(c(25-10.1,25-5.7,25-3.4,25-2.18,25-0),c(350,15000,120000,127000,225000),cex=2,pch=20,col=emp)
 segments(c(25-10.1,25-5.7,25-3.4,25-2.18), c(350,15000,120000,127000), c(25-5.7,25-3.4,25-2.18,25-0), c(15000,120000,127000,225000), lwd=2, col=emp)
-for (i in 2:84){
+for (i in 2:100){
 if (length(which(data[,i]%in%NA))!=0){
 par(new=T)
 plot(min((which(data[,i]%in%NA)))-2,-(data[min(which(data[,i]%in%NA))-1,i]),type='l',axes=F,col=transp(sims,tra),ylim=c(0,350000),main="",xlab="",ylab="",xaxt='n',yaxt='n')
@@ -170,7 +170,7 @@ data<-read.table("Fin_Bt50_RGL.txt",h=F)
 data<-exp(data)
 ms<-apply(data,1,function(x) mean(x,na.rm=T))
 #plot(0:24,(data$V1),type='l',ylim=c(0,1),yaxt='n',ylab="",xaxt='n',axes=F,xlab="",main="",col=transp(sims,tra))
-#for (i in 2:99){
+#for (i in 2:100){
 #if (length(which(data[,i]%in%NA))!=0){
 #par(new=T)
 #plot(min((which(data[,i]%in%NA)))-2,-(data[min(which(data[,i]%in%NA))-1,i]),axes=F,type='l',col=transp(sims,tra),xlim=c(0,24),ylim=c(0,8),main="",xlab="",ylab="",xaxt='n',yaxt='n')
@@ -186,7 +186,7 @@ data<-read.table("Fin_Bt100_RGL.txt",h=F)
 data<-exp(data)
 ms<-apply(data[,-16],1,function(x) mean(x,na.rm=T))
 #plot(0:24,(data$V1),type='l',ylim=c(0,1),yaxt='n',ylab="",xaxt='n',axes=F,xlab="",main="",col=transp(sims,tra))
-#for (i in 2:99){
+#for (i in 2:100){
 #if (length(which(data[,i]%in%NA))!=0){
 #par(new=T)
 #plot(min((which(data[,i]%in%NA)))-2,-(data[min(which(data[,i]%in%NA))-1,i]),axes=F,type='l',col=transp(sims,tra),xlim=c(0,24),ylim=c(0,8),main="",xlab="",ylab="",xaxt='n',yaxt='n')
@@ -202,7 +202,7 @@ data<-read.table("Fin_Bt250_RGL.txt",h=F)
 data<-exp(data)
 ms<-apply(data,1,function(x) mean(x,na.rm=T))
 #plot(0:24,(data$V1),type='l',ylim=c(0,1),yaxt='n',ylab="",xaxt='n',axes=F,xlab="",main="",col=transp(sims,tra))
-#for (i in 2:99){
+#for (i in 2:100){
 #if (length(which(data[,i]%in%NA))!=0){
 #par(new=T)
 #plot(min((which(data[,i]%in%NA)))-2,-(data[min(which(data[,i]%in%NA))-1,i]),axes=F,type='l',col=transp(sims,tra),xlim=c(0,24),ylim=c(0,8),main="",xlab="",ylab="",xaxt='n',yaxt='n')
@@ -218,7 +218,7 @@ data<-read.table("Fin_Bt500_RGL.txt",h=F)
 data<-exp(data)
 ms<-apply(data,1,function(x) mean(x,na.rm=T))
 #plot(0:24,(data$V1),type='l',ylim=c(0,1),yaxt='n',ylab="",xaxt='n',axes=F,xlab="",main="",col=transp(sims,tra))
-#for (i in 2:99){
+#for (i in 2:100){
 #if (length(which(data[,i]%in%NA))!=0){
 #par(new=T)
 #plot(min((which(data[,i]%in%NA)))-2,-(data[min(which(data[,i]%in%NA))-1,i]),axes=F,type='l',col=transp(sims,tra),xlim=c(0,24),ylim=c(0,8),main="",xlab="",ylab="",xaxt='n',yaxt='n')
@@ -234,7 +234,7 @@ data<-read.table("Fin_Bt1000_RGL.txt",h=F)
 data<-exp(data)
 ms<-apply(data,1,function(x) mean(x,na.rm=T))
 #plot(0:24,(data$V1),type='l',ylim=c(0,1),yaxt='n',ylab="",xaxt='n',axes=F,xlab="",main="",col=transp(sims,tra))
-#for (i in 2:99){
+#for (i in 2:100){
 #if (length(which(data[,i]%in%NA))!=0){
 #par(new=T)
 #plot(min((which(data[,i]%in%NA)))-2,-(data[min(which(data[,i]%in%NA))-1,i]),axes=F,type='l',col=transp(sims,tra),xlim=c(0,24),ylim=c(0,8),main="",xlab="",ylab="",xaxt='n',yaxt='n')
